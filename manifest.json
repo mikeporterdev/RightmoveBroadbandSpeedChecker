@@ -11,10 +11,11 @@
   },
   "content_scripts": [ {
     "matches": ["http://*/*"],
-    "js": ["jquery-3.2.1.min.js", "rm.js"]
+    "js": ["jquery-3.2.1.min.js", "rm.js", "popup.js"]
 } ],
   "permissions": [
     "activeTab",
-    "http://www.rightmove.co.uk/"
+    "http://www.rightmove.co.uk/",
+    "storage"
   ]
 }
