@@ -1,17 +1,7 @@
 
 const url = "http://rightmove.co.uk/ajax/broadband-speed-result.html?searchLocation=";
 
-function filterCards() {
-    console.log("Triggered");
-    var properties = $('.propertyCard').not('.is-hidden > div');
 
-    $.each(properties, function (i, property) {
-        var title = $(property).find('.propertyCard-title');
-
-        var link = $(property).find('.propertyCard-link').attr("href");
-        getPostcode(link, title);
-    });
-}
 $(document).ready(function () {
     $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
 
@@ -26,6 +16,17 @@ $(document).ready(function () {
     })
 });
 
+function filterCards() {
+    var properties = $('.propertyCard').not('.is-hidden > div');
+
+    $.each(properties, function (i, property) {
+        var title = $(property).find('.propertyCard-title');
+
+        var link = $(property).find('.propertyCard-link').attr("href");
+        getPostcode(link, title);
+    });
+}
+
 
 function updateBroadbandSpeed(broadbandLink, title) {
     $.getJSON(url + broadbandLink, function (response) {
@@ -37,7 +38,7 @@ function updateBroadbandSpeed(broadbandLink, title) {
             if (broadbandSpeed >= minBroadbandSpeed)
                 $(title).append('<div style="float:right">' + broadbandSpeed + 'mbps</div>');
             else if (minBroadbandSpeed > 0)
-                hideCard(title)
+                hideCard(title);
 
             updateCounter();
         });

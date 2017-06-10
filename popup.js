@@ -12,10 +12,9 @@ function save_options() {
         status.textContent = 'Options saved. ';
         setTimeout(function() {
             status.textContent = '';
-        }, 750);
+        }, 2000);
 
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            console.log(tabs)
             chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
         });
     });
