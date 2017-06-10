@@ -13,8 +13,12 @@ function save_options() {
         setTimeout(function() {
             status.textContent = '';
         }, 750);
-    });
 
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            console.log(tabs)
+            chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+        });
+    });
 }
 
 function restore_options() {
