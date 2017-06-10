@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "Rightmove Broadband Speed Checker",
+  "description": "This extension shows the broadband speed of a property on the RightMove search page",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [ {
+    "matches": ["http://*/*"],
+    "js": ["jquery-3.2.1.min.js", "rm.js"]
+} ],
+  "permissions": [
+    "activeTab",
+    "http://www.rightmove.co.uk/"
+  ]
+}
