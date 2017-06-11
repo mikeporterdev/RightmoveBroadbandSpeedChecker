@@ -25,7 +25,7 @@ function initialSetup() {
 
     $.each(properties, function (i, property) {
         var title = $(property).find('.propertyCard-title');
-        $(title).append('<div class="speedText" style="float:right">... mbps</div>')
+        $(title).append('<div class="speedText" style="float:right">...mbps</div>')
     });
 }
 
@@ -40,10 +40,7 @@ function filterCards() {
     var properties = $('.propertyCard').not('.is-hidden > div');
 
     $.each(properties, function (i, property) {
-        var title = $(property).find('.propertyCard-title');
-
-        var link = $(property).find('.propertyCard-link').attr("href");
-        getPostcode(link, title);
+        updatePropertyCard(property);
     });
 }
 
@@ -65,13 +62,20 @@ function updateBroadbandSpeed(broadbandLink, title) {
     });
 }
 
-function getPostcode(link, title) {
+function updatePropertyCard(property) {
+    if ($(property).find('.speedText').text() != "...mbps") {
+        return;
+    }
+
+    var link = $(property).find('.propertyCard-link').attr("href");
+
     $.get(link, function (data) {
         var hrefText = $(data).find('.icon-broadband').attr("href");
 
         if (hrefText) {
             var broadbandLink = hrefText.split('#')[1];
             broadbandLink = broadbandLink.replace("_", "+");
+            var title = $(property).find('.propertyCard-title');
             updateBroadbandSpeed(broadbandLink, title);
         }
     });
