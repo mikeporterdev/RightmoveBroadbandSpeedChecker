@@ -4,14 +4,15 @@
 
 function save_options() {
 
-    var filterSpeed = document.getElementById('speed').value;
-    filterSpeed = filterSpeed ? filterSpeed : 0;
+    var filterSpeed = $('#speed').val();
+    if (isNaN(filterSpeed)) filterSpeed = 0;
 
     chrome.storage.local.set({'filterSpeed' : filterSpeed}, function () {
-        var status = document.getElementById('status');
-        status.textContent = 'Options saved. ';
+
+        var status = $('#status');
+        status.text('Options saved. ');
         setTimeout(function() {
-            status.textContent = '';
+            status.text('');
         }, 2000);
 
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -21,17 +22,16 @@ function save_options() {
 }
 
 function restore_options() {
-    var minBroadbandSpeed = 0;
     chrome.storage.local.get("filterSpeed", function(results) {
-        minBroadbandSpeed = results.filterSpeed;
-        document.getElementById('speed').value = minBroadbandSpeed
+        $('#speed').val(results.filterSpeed);
     });
-
 }
 
 function init() {
     restore_options();
-    document.getElementById("save").addEventListener("click", save_options);
+
+    $('#save').click(save_options);
 }
 
-document.addEventListener('DOMContentLoaded', init);
+$(document).ready(init);
+
