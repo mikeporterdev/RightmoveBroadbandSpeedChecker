@@ -3,8 +3,6 @@ const url = "http://rightmove.co.uk/ajax/broadband-speed-result.html?searchLocat
 $(document).ready(function () {
     $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
 
-    initialSetup();
-
     filterCards();
 
     $('#filtersBar').on('input', updateOnChange);
@@ -19,15 +17,6 @@ $(document).ready(function () {
     $('.pagination-dropdown').on('change', updateOnChange);
 
 });
-
-function initialSetup() {
-    var properties = $('.propertyCard').not('.is-hidden > div');
-
-    $.each(properties, function (i, property) {
-        var title = $(property).find('.propertyCard-title');
-        $(title).append('<div class="speedText" style="float:right">...mbps</div>')
-    });
-}
 
 function updateOnChange() {
     $('#hiddenCounter').text(0);
@@ -62,8 +51,20 @@ function updateBroadbandSpeed(broadbandLink, title) {
     });
 }
 
+function addSpeedTestIfNotExists(property) {
+    var speedTest = $(property).find('.speedText');
+
+    if (speedTest.length == 0) {
+        var title = $(property).find('.propertyCard-title');
+        $(title).append('<div class="speedText" style="float:right">...mbps</div>')
+    }
+}
 function updatePropertyCard(property) {
-    if ($(property).find('.speedText').text() != "...mbps") {
+    addSpeedTestIfNotExists(property);
+
+    var speedTest = $(property).find('.speedText');
+    if (speedTest.text() != "...mbps") {
+        //Already got the internet speed for this property
         return;
     }
 
