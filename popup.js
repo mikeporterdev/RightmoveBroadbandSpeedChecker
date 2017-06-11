@@ -1,6 +1,4 @@
-/**
- * Created by m_por on 10/06/2017.
- */
+
 
 function save_options() {
 
@@ -14,16 +12,20 @@ function save_options() {
         setTimeout(function() {
             status.text('');
         }, 2000);
-
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
-        });
+        refreshTab();
     });
 }
 
 function restore_options() {
     chrome.storage.local.get("filterSpeed", function(results) {
         $('#speed').val(results.filterSpeed);
+    });
+}
+
+function refreshTab() {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        var currentTab = tabs[0];
+        chrome.tabs.update(currentTab.id, {url: currentTab.url});
     });
 }
 
