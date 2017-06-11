@@ -1,20 +1,29 @@
-
 const url = "http://rightmove.co.uk/ajax/broadband-speed-result.html?searchLocation=";
-
 
 $(document).ready(function () {
     $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
 
     filterCards();
 
-    $('#filtersBar').on('input', function() {
-        $('#hiddenCounter').text(0);
-        setTimeout(function() {
-            filterCards();
-        }, 500)
+    $('#filtersBar').on('input', updateOnChange);
 
-    })
+    // Sort filters and pagination controls aren't wrapped in a form so have to handle the changes manually
+    $('.searchLayoutControls-link--grid').click(updateOnChange);
+    $('.searchLayoutControls-link--list').click(updateOnChange);
+    // Ignore map view as we can't interact with it anyway
+    $('#sortType').on('change', updateOnChange);
+
+    $('.pagination-controls').click(updateOnChange);
+    $('.pagination-dropdown').on('change', updateOnChange);
+
 });
+
+function updateOnChange() {
+    $('#hiddenCounter').text(0);
+    setTimeout(function () {
+        filterCards();
+    }, 500)
+}
 
 function filterCards() {
     var properties = $('.propertyCard').not('.is-hidden > div');

@@ -23,6 +23,7 @@ function restore_options() {
 }
 
 function refreshTab() {
+    //TODO: Refactor to only refresh rightmove
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
         var currentTab = tabs[0];
         chrome.tabs.update(currentTab.id, {url: currentTab.url});
