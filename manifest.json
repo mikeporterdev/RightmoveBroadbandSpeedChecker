@@ -11,7 +11,7 @@
   },
   "content_scripts": [ {
     "matches": ["http://*/*"],
-    "js": ["jquery-3.2.1.min.js", "rm.js", "popup.js"]
+    "js": ["lib/jquery-3.2.1.min.js", "rm.js", "popup.js"]
 } ],
   "permissions": [
     "activeTab",
