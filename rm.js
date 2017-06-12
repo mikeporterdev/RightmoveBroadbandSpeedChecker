@@ -41,10 +41,9 @@ function updateBroadbandSpeed(broadbandLink, title) {
         chrome.storage.local.get("filterSpeed", function(results) {
             var minBroadbandSpeed = results.filterSpeed;
 
-            if (broadbandSpeed >= minBroadbandSpeed)
-                $(title).find('.speedText').text(broadbandSpeed + 'mbps');
-            else if (minBroadbandSpeed > 0)
-                hideCard(title);
+            $(title).find('.speedText').text(broadbandSpeed + 'mbps');
+
+            $(title).closest('.l-searchResult').toggle(minBroadbandSpeed > 0 && broadbandSpeed >= minBroadbandSpeed);
 
             updateCounter();
         });
@@ -80,10 +79,6 @@ function updatePropertyCard(property) {
             updateBroadbandSpeed(broadbandLink, title);
         }
     });
-}
-
-function hideCard(title) {
-    $(title).closest('.l-searchResult').hide();
 }
 
 function updateCounter() {
