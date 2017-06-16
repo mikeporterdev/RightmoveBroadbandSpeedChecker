@@ -1,7 +1,6 @@
 
 
 function save_options() {
-
     var filterSpeed = $('#speed').val();
     if (isNaN(filterSpeed)) filterSpeed = 0;
 

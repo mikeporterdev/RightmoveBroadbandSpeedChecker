@@ -5,17 +5,7 @@ $(document).ready(function () {
 
     filterCards();
 
-    $('#filtersBar').on('input', updateOnChange);
-
-    // Sort filters and pagination controls aren't wrapped in a form so have to handle the changes manually
-    $('.searchLayoutControls-link--grid').click(updateOnChange);
-    $('.searchLayoutControls-link--list').click(updateOnChange);
-    // Ignore map view as we can't interact with it anyway
-    $('#sortType').on('change', updateOnChange);
-
-    $('.pagination-controls').click(updateOnChange);
-    $('.pagination-dropdown').on('change', updateOnChange);
-
+    $('.l-searchResult').bind('DOMNodeInserted, DOMNodeRemoved', updateOnChange);
 });
 
 function updateOnChange() {
@@ -33,31 +23,6 @@ function filterCards() {
     });
 }
 
-
-function updateBroadbandSpeed(broadbandLink, title) {
-    $.getJSON(url + broadbandLink, function (response) {
-        var broadbandSpeed = response['broadbandAverageSpeed'];
-
-        chrome.storage.local.get("filterSpeed", function(results) {
-            var minBroadbandSpeed = results.filterSpeed;
-
-            $(title).find('.speedText').text(broadbandSpeed + 'mbps');
-
-            $(title).closest('.l-searchResult').toggle(minBroadbandSpeed > 0 && broadbandSpeed >= minBroadbandSpeed);
-
-            updateCounter();
-        });
-    });
-}
-
-function addSpeedTestIfNotExists(property) {
-    var speedTest = $(property).find('.speedText');
-
-    if (speedTest.length == 0) {
-        var title = $(property).find('.propertyCard-title');
-        $(title).append('<div class="speedText" style="float:right">...mbps</div>')
-    }
-}
 function updatePropertyCard(property) {
     addSpeedTestIfNotExists(property);
 
@@ -79,6 +44,34 @@ function updatePropertyCard(property) {
             updateBroadbandSpeed(broadbandLink, title);
         }
     });
+}
+
+function updateBroadbandSpeed(broadbandLink, title) {
+    $.getJSON(url + broadbandLink, function (response) {
+        var broadbandSpeed = response['broadbandAverageSpeed'];
+
+        chrome.storage.local.get("filterSpeed", function(results) {
+            var minBroadbandSpeed = results.filterSpeed;
+            if (minBroadbandSpeed == undefined) {
+                minBroadbandSpeed = 0
+            }
+
+            $(title).find('.speedText').text(broadbandSpeed + 'mbps');
+
+            $(title).closest('.l-searchResult').toggle(minBroadbandSpeed > 0 && broadbandSpeed >= minBroadbandSpeed);
+
+            updateCounter();
+        });
+    });
+}
+
+function addSpeedTestIfNotExists(property) {
+    var speedTest = $(property).find('.speedText');
+
+    if (speedTest.length == 0) {
+        var title = $(property).find('.propertyCard-title');
+        $(title).append('<div class="speedText" style="float:right">...mbps</div>')
+    }
 }
 
 function updateCounter() {
