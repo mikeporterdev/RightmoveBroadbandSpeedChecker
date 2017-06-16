@@ -1,8 +1,8 @@
 
 
-function save_options() {
-    var filterSpeed = $('#speed').val();
-    if (isNaN(filterSpeed)) filterSpeed = 0;
+function save_options(filterSpeed) {
+    // var filterSpeed = $('#speed').val();
+    // if (isNaN(filterSpeed)) filterSpeed = 0;
 
     chrome.storage.local.set({'filterSpeed' : filterSpeed}, function () {
 
@@ -17,7 +17,21 @@ function save_options() {
 
 function restore_options() {
     chrome.storage.local.get("filterSpeed", function(results) {
-        $('#speed').val(results.filterSpeed);
+        var filterSpeed = results.filterSpeed;
+
+        if (filterSpeed == "") filterSpeed = 0;
+
+        $('#speed').val(filterSpeed);
+
+        if (["0", "17", "52", "200", "1000"].indexOf(filterSpeed) > -1){
+            $('#speedSelect').val(filterSpeed);
+        } else {
+            $('#speedSelect').val("custom");
+            $('#speedInput').show();
+            $('#speedInput').val(filterSpeed);
+            $('#save').show();
+        }
+
     });
 }
 
@@ -30,9 +44,22 @@ function refreshTab() {
 }
 
 function init() {
-    restore_options();
 
-    $('#save').click(save_options);
+    $('#speedSelect').on("change", function () {
+        var value = $(this).val();
+
+        if (!isNaN(value)) {
+            save_options(value);
+        }
+        $('#speedInput').toggle(value === "custom");
+        $('#save').toggle(value === "custom");
+    });
+
+    $('#save').click(function () {
+        save_options($('#speedInput').val())
+    });
+
+    restore_options();
 }
 
 $(document).ready(init);
