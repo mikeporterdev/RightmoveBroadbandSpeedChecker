@@ -95,7 +95,7 @@ function updateCard(property, speed) {
     if (speed > 0) {
         chrome.storage.local.get("filterSpeed", function (results) {
             var minBroadbandSpeed = results.filterSpeed;
-            if (minBroadbandSpeed == "") {
+            if (minBroadbandSpeed == undefined || minBroadbandSpeed == "") {
                 minBroadbandSpeed = 0
             }
 
