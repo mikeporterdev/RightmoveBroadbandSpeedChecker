@@ -3,7 +3,7 @@
 
   "name": "Rightmove Broadband Speed Checker",
   "description": "This extension shows and filters the broadband speed of a property on the RightMove search page",
-  "version": "0.0.4",
+  "version": "0.0.5",
 
   "browser_action": {
     "default_icon": "icon.png",
