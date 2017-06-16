@@ -1,18 +1,17 @@
 
-
 function save_options(filterSpeed) {
-    // var filterSpeed = $('#speed').val();
-    // if (isNaN(filterSpeed)) filterSpeed = 0;
-
     chrome.storage.local.set({'filterSpeed' : filterSpeed}, function () {
-
-        var status = $('#status');
-        status.text('Options saved. ');
-        setTimeout(function() {
-            status.text('');
-        }, 2000);
+        displayFeedback('Options saved. ');
         refreshTab();
     });
+}
+
+function displayFeedback(feedback) {
+    var status = $('#status');
+    status.text(feedback);
+    setTimeout(function () {
+        status.text('');
+    }, 2000);
 }
 
 function restore_options() {
@@ -56,7 +55,10 @@ function init() {
     });
 
     $('#save').click(function () {
-        save_options($('#speedInput').val())
+
+        var filterSpeed = $('#speedInput').val();
+        if (isNaN(filterSpeed)) displayFeedback("Must be a number");
+        else save_options(filterSpeed)
     });
 
     restore_options();
