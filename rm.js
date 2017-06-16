@@ -1,19 +1,34 @@
 const url = "http://rightmove.co.uk/ajax/broadband-speed-result.html?searchLocation=";
 
 var speedCache = {};
-
 $(document).ready(function () {
+    var pathname = window.location.pathname;
+
+    if (pathname === '/property-to-rent/find.html' || pathname === '/property-for-sale/find.html') {
+        searchPage();
+    } else if (pathname.indexOf('/property-to-rent/property-') > -1 || pathname.indexOf('/property-for-sale/property-') > -1) {
+        propertyPage();
+    }
+});
+
+function propertyPage() {
+
+    var hrefText = $('.icon-broadband').attr("href");
+    updateBroadbandSpeedOnPropertyPage(hrefText);
+}
+
+function searchPage() {
     $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
 
     filterCards();
 
-    $('.l-searchResult').bind('DOMNodeInserted, DOMNodeRemoved', function(event) {
+    $('.l-searchResult').bind('DOMNodeInserted, DOMNodeRemoved', function (event) {
         //Ignore the changing of speedtext
         if (!$(event.target).hasClass("speedText")) {
             updateOnChange();
         }
     });
-});
+}
 
 function updateOnChange() {
     $('#hiddenCounter').text(0);
@@ -35,7 +50,7 @@ function updatePropertyCard(property) {
 
     var propertyId = $(property).find('.propertyCard-anchor').attr('id');
 
-    if (!(propertyId in speedCache))  {
+    if (!(propertyId in speedCache)) {
 
         speedCache[propertyId] = 0;
         var link = $(property).find('.propertyCard-link').attr("href");
@@ -43,9 +58,7 @@ function updatePropertyCard(property) {
             var hrefText = $(data).find('.icon-broadband').attr("href");
 
             if (hrefText) {
-                var broadbandLink = hrefText.split('#')[1];
-                broadbandLink = broadbandLink.replace("_", "+");
-                updateBroadbandSpeed(broadbandLink, property);
+                updateBroadbandSpeedOnSearchResult(hrefText, property);
             }
         });
     } else {
@@ -53,7 +66,10 @@ function updatePropertyCard(property) {
     }
 }
 
-function updateBroadbandSpeed(broadbandLink, property) {
+function updateBroadbandSpeedOnSearchResult(hrefText, property) {
+    var broadbandLink = hrefText.split('#')[1];
+    broadbandLink = broadbandLink.replace("_", "+");
+
     $.getJSON(url + broadbandLink, function (response) {
         var broadbandSpeed = response['broadbandAverageSpeed'];
 
@@ -65,9 +81,19 @@ function updateBroadbandSpeed(broadbandLink, property) {
     });
 }
 
+function updateBroadbandSpeedOnPropertyPage(hrefText) {
+    var broadbandLink = hrefText.split('#')[1];
+    broadbandLink = broadbandLink.replace("_", "+");
+
+    $.getJSON(url + broadbandLink, function (response) {
+        var broadbandSpeed = response['broadbandAverageSpeed'];
+        $('.fs-22').append(" - " + broadbandSpeed + " mbps");
+    });
+}
+
 function updateCard(property, speed) {
     if (speed > 0) {
-        chrome.storage.local.get("filterSpeed", function(results) {
+        chrome.storage.local.get("filterSpeed", function (results) {
             var minBroadbandSpeed = results.filterSpeed;
             if (minBroadbandSpeed == "") {
                 minBroadbandSpeed = 0
