@@ -6,6 +6,7 @@
         body {
             font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
             font-size: 100%;
+            width:275px;
         }
     </style>
 
@@ -19,7 +20,7 @@
 <div id="status"></div>
 <label for="speedSelect">Filter by speed</label>
 <br/>
-<select id="speedSelect">
+<select id="speedSelect" style="width: 100%">
     <option value="0">Don't filter</option>
     <option value="17">ADSL (17mbps)</option>
     <option value="52">Fiber (52mbps)</option>
@@ -27,9 +28,8 @@
     <option value="1000">Gigabit (1000mbps)</option>
     <option value="custom">Custom</option>
 </select>
-<label style="font-size: 12px">Set to zero to not filter</label>
 <input id="speedInput" style="display: none"/>
-<button id="save">Save</button>
+<button id="save" style="display: none">Save</button>
 
 </body>
 </html>
