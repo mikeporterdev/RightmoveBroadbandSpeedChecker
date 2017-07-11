@@ -12,12 +12,9 @@ $(document).ready(function () {
 });
 
 function propertyPage() {
-
     var hrefText = $('.icon-broadband').attr("href");
     updateBroadbandSpeedOnPropertyPage(hrefText);
 }
-
-
 
 function searchPage() {
     $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
@@ -41,6 +38,7 @@ function updateOnChange() {
 
 function filterCards() {
     var properties = $('.propertyCard').not('.is-hidden > div');
+    $('.js-searchResult-creative').hide();
 
     $.each(properties, function (i, property) {
         updatePropertyCard(property);
@@ -102,7 +100,8 @@ function updateCard(property, speed) {
             }
 
             $(property).find('.speedText').text(speed + 'mbps');
-            $(property).toggle(minBroadbandSpeed == 0 || speed >= minBroadbandSpeed);
+            var parent = $(property).parent();
+            parent.toggle(minBroadbandSpeed == 0 || speed >= minBroadbandSpeed);
 
             updateCounter();
         });
