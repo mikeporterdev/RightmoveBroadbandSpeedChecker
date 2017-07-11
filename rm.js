@@ -4,9 +4,9 @@ var speedCache = {};
 $(document).ready(function () {
     var pathname = window.location.pathname;
 
-    if (pathname === '/property-to-rent/find.html' || pathname === '/property-for-sale/find.html') {
+    if (contains(pathname, '/property-to-rent/find.html') || contains(pathname, '/property-for-sale/find.html')) {
         searchPage();
-    } else if (pathname.indexOf('/property-to-rent/property-') > -1 || pathname.indexOf('/property-for-sale/property-') > -1) {
+    } else if (contains(pathname, '/property-to-rent/property-') || contains(pathname, '/property-for-sale/property-')) {
         propertyPage();
     }
 });
@@ -16,6 +16,8 @@ function propertyPage() {
     var hrefText = $('.icon-broadband').attr("href");
     updateBroadbandSpeedOnPropertyPage(hrefText);
 }
+
+
 
 function searchPage() {
     $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
@@ -120,4 +122,8 @@ function updateCounter() {
     var properties = $('.propertyCard:hidden').not('.is-hidden > div');
 
     $('#hiddenCounter').text(properties.length);
+}
+
+function contains(string, searchString) {
+    return string.indexOf(searchString) > -1
 }
