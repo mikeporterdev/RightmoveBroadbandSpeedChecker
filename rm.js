@@ -1,6 +1,7 @@
 const url = "http://rightmove.co.uk/ajax/broadband-speed-result.html?searchLocation=";
 
 var speedCache = {};
+
 $(document).ready(function () {
     var pathname = window.location.pathname;
 
@@ -19,6 +20,7 @@ function propertyPage() {
 function searchPage() {
     $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
 
+    setupFilter();
     filterCards();
 
     $('.l-searchResult').bind('DOMNodeInserted, DOMNodeRemoved', function (event) {
@@ -26,6 +28,51 @@ function searchPage() {
         if (!$(event.target).hasClass("speedText")) {
             updateOnChange();
         }
+    });
+}
+
+function setupFilter() {
+    $('#letTypeFilter').after(`
+    <div class="addedToSiteAndLetType">
+        <label class="filters-label">Broadband Speed:</label>
+        <div class="addedToSiteAndLetType-flexSpaceWrapper">
+            <div class="select-wrapper filters-selectWrapper">
+                <div class="select-value">
+                    <span class="select-valuePrefix">Let Type:</span>
+                    <span id="filterSpeedLabel">Any</span>
+                    <div class="no-svg-chevron select-chevron">
+                        <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#core-icon--chevron"></use></svg>
+                    </div>
+                </div>
+                <select id="speedSelect2" class="select" data-bind="optionsValue: 'value'"> 
+                    <option value="0">Don't filter</option>
+                    <option value="17">ADSL (17mbps)</option>
+                    <option value="52">Fiber (52mbps)</option>
+                    <option value="200">Superfast (200mbps)</option>
+                    <option value="1000">Gigabit (1000mbps)</option>
+                </select>
+            </div>
+            <div class="addedToSiteAndLetType-flexSpacer"></div>
+        </div>
+    </div>
+    `);
+
+    chrome.storage.local.get('filterSpeed', function (results) {
+        $('#filterSpeedLabel').text(results.filterSpeed + 'mbps');
+    });
+
+    $('#speedSelect2').on("change", function () {
+        var value = $(this).val();
+
+        save_options2(value);
+        filterCards();
+    });
+}
+
+function save_options2(filterSpeed) {
+    chrome.storage.local.set({'filterSpeed' : filterSpeed}, function () {
+        console.log("Saved");
+        $('#filterSpeedLabel').text(filterSpeed + 'mbps');
     });
 }
 

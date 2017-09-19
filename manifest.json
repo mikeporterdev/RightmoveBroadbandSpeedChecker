@@ -5,17 +5,12 @@
   "description": "This extension shows and filters the broadband speed of a property on the RightMove search page",
   "version": "1.0.1",
 
-  "browser_action": {
-    "default_icon": "icon.png",
-    "default_popup": "popup.html"
-  },
+
   "content_scripts": [ {
-    "matches": ["http://*/*"],
-    "js": ["lib/jquery-3.2.1.min.js", "rm.js", "popup.js"]
+    "matches": ["http://*.rightmove.co.uk/*", "http://*.rightmove.com/*"],
+    "js": ["lib/jquery-3.2.1.min.js", "rm.js"]
 } ],
   "permissions": [
-    "activeTab",
-    "http://www.rightmove.co.uk/",
     "storage"
   ]
 }
