@@ -44,7 +44,7 @@ function setupFilter() {
                         <svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#core-icon--chevron"></use></svg>
                     </div>
                 </div>
-                <select id="speedSelect2" class="select" data-bind="optionsValue: 'value'"> 
+                <select id="speedSelect" class="select" data-bind="optionsValue: 'value'"> 
                     <option value="0">Don't filter</option>
                     <option value="17">ADSL (17mbps)</option>
                     <option value="52">Fiber (52mbps)</option>
@@ -58,22 +58,29 @@ function setupFilter() {
     `);
 
     chrome.storage.local.get('filterSpeed', function (results) {
-        $('#filterSpeedLabel').text(results.filterSpeed + 'mbps');
+        updateSpeedLabel(results.filterSpeed)
     });
 
-    $('#speedSelect2').on("change", function () {
+    $('#speedSelect').on("change", function () {
         var value = $(this).val();
 
-        save_options2(value);
+        cacheSpeedFilter(value);
         filterCards();
     });
 }
 
-function save_options2(filterSpeed) {
+function cacheSpeedFilter(filterSpeed) {
     chrome.storage.local.set({'filterSpeed' : filterSpeed}, function () {
-        console.log("Saved");
-        $('#filterSpeedLabel').text(filterSpeed + 'mbps');
+        updateSpeedLabel(filterSpeed);
     });
+}
+
+function updateSpeedLabel(speed){
+    if (!speed || speed == 0) {
+        $('#filterSpeedLabel').text("Any");
+    } else {
+        $('#filterSpeedLabel').text(speed + 'mbps');
+    }
 }
 
 function updateOnChange() {
