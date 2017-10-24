@@ -3,11 +3,11 @@
 
   "name": "Rightmove Broadband Speed Checker",
   "description": "This extension shows and filters the broadband speed of a property on the RightMove search page",
-  "version": "1.0.2",
+  "version": "1.0.4",
 
 
   "content_scripts": [ {
-    "matches": ["http://*.rightmove.co.uk/*", "http://*.rightmove.com/*"],
+    "matches": ["*://*.rightmove.co.uk/*", "*://*.rightmove.com/*"],
     "js": ["lib/jquery-3.2.1.min.js", "rm.js"]
 } ],
   "permissions": [

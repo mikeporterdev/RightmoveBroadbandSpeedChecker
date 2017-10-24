@@ -32,7 +32,16 @@ function searchPage() {
 }
 
 function setupFilter() {
-    $('#letTypeFilter').after(`
+    var filterArea;
+    var forSale = false;
+    if ($('#letTypeFilter').length > 0) {
+        filterArea = $('#letTypeFilter');
+    } else {
+        forSale = true;
+        filterArea = $('#addedToSiteFilter');
+    }
+    console.log(filterArea)
+    filterArea.after(`
     <div class="addedToSiteAndLetType">
         <label class="filters-label">Broadband Speed:</label>
         <div class="addedToSiteAndLetType-flexSpaceWrapper">
@@ -56,6 +65,12 @@ function setupFilter() {
         </div>
     </div>
     `);
+
+    if (forSale) {
+        $('.filtersTray-filter .select-wrapper').width('100%');
+        $('.addedToSiteAndLetType').width('24%');
+        $('.addedToSiteAndLetType-flexSpacer').hide();
+    }
 
     chrome.storage.local.get('filterSpeed', function (results) {
         updateSpeedLabel(results.filterSpeed)
