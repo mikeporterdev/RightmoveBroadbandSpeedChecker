@@ -5,7 +5,7 @@ var speedCache = {};
 $(document).ready(function () {
     var pathname = window.location.pathname;
 
-    if (contains(pathname, '/property-to-rent/find.html') || contains(pathname, '/property-for-sale/find.html')) {
+    if (contains(pathname, '/property-to-rent/find.html') || contains(pathname, '/property-for-sale/find.html') || contains(pathname, '/student-accommodation') || contains(pathname, 'new-homes-for-sale')) {
         searchPage();
     } else if (contains(pathname, '/property-to-rent/property-') || contains(pathname, '/property-for-sale/property-')) {
         propertyPage();
@@ -18,7 +18,12 @@ function propertyPage() {
 }
 
 function searchPage() {
-    $('#searchHeader').append(" (<span id='hiddenCounter'>0</span> filtered for broadband speed)");
+    let message = " (<span id='hiddenCounter'>0</span> filtered for broadband speed)";
+
+    if (contains(window.location.pathname, 'new-homes-for-sale')) {
+        message += " New homes may not be registered with the broadband service"
+    }
+    $('#searchHeader').append(message);
 
     setupFilter();
     filterCards();
