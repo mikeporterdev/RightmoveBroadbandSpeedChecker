@@ -13,12 +13,19 @@ $(document).ready(function () {
 });
 
 function propertyPage() {
-    var hrefText = $('.icon-broadband').attr("href");
-    updateBroadbandSpeedOnPropertyPage(hrefText);
+
+    var re = new RegExp('broadbandCtmUrl: \\"(.*)"');
+    var exec = re.exec(document.documentElement.innerHTML);
+
+    if (exec && exec[1]) {
+        updateBroadbandSpeedOnPropertyPage(exec[1]);
+    }
+
+
 }
 
 function searchPage() {
-    let message = " (<span id='hiddenCounter'>0</span> filtered for broadband speed)";
+    var message = " (<span id='hiddenCounter'>0</span> filtered for broadband speed)";
 
     if (contains(window.location.pathname, 'new-homes-for-sale')) {
         message += " New homes may not be registered with the broadband service"
@@ -45,7 +52,6 @@ function setupFilter() {
         forSale = true;
         filterArea = $('#addedToSiteFilter');
     }
-    console.log(filterArea)
     filterArea.after(`
     <div class="addedToSiteAndLetType">
         <label class="filters-label">Broadband Speed:</label>
@@ -90,12 +96,12 @@ function setupFilter() {
 }
 
 function cacheSpeedFilter(filterSpeed) {
-    chrome.storage.local.set({'filterSpeed' : filterSpeed}, function () {
+    chrome.storage.local.set({'filterSpeed': filterSpeed}, function () {
         updateSpeedLabel(filterSpeed);
     });
 }
 
-function updateSpeedLabel(speed){
+function updateSpeedLabel(speed) {
     if (!speed || speed == 0) {
         $('#filterSpeedLabel').text("Any");
     } else {
@@ -129,10 +135,12 @@ function updatePropertyCard(property) {
         speedCache[propertyId] = 0;
         var link = $(property).find('.propertyCard-link').attr("href");
         $.get(link, function (data) {
-            var hrefText = $(data).find('.icon-broadband').attr("href");
 
-            if (hrefText) {
-                updateBroadbandSpeedOnSearchResult(hrefText, property);
+            var re = new RegExp('broadbandCtmUrl: \\"(.*)"');
+            var exec = re.exec(data);
+
+            if (exec && exec[1]) {
+                updateBroadbandSpeedOnSearchResult(exec[1], property);
             }
         });
     } else {
@@ -140,12 +148,11 @@ function updatePropertyCard(property) {
     }
 }
 
-function updateBroadbandSpeedOnSearchResult(hrefText, property) {
-    var broadbandLink = hrefText.split('#')[1];
-    broadbandLink = broadbandLink.replace("_", "+");
 
-    $.getJSON(url + broadbandLink, function (response) {
-        var broadbandSpeed = response['broadbandAverageSpeed'];
+function updateBroadbandSpeedOnSearchResult(broadbandLink, property) {
+    $.getJSON(broadbandLink, function (response) {
+        var broadbandSpeed = response['speed_display'].slice(0, -2);
+
 
         var propertyId = $(property).find('.propertyCard-anchor').attr('id');
         speedCache[propertyId] = broadbandSpeed;
@@ -155,12 +162,9 @@ function updateBroadbandSpeedOnSearchResult(hrefText, property) {
     });
 }
 
-function updateBroadbandSpeedOnPropertyPage(hrefText) {
-    var broadbandLink = hrefText.split('#')[1];
-    broadbandLink = broadbandLink.replace("_", "+");
-
-    $.getJSON(url + broadbandLink, function (response) {
-        var broadbandSpeed = response['broadbandAverageSpeed'];
+function updateBroadbandSpeedOnPropertyPage(broadbandLink) {
+    $.getJSON(broadbandLink, function (response) {
+        var broadbandSpeed = response['speed_display'].slice(0, -2);
         $('.fs-22').append(" - " + broadbandSpeed + " mbps");
     });
 }
