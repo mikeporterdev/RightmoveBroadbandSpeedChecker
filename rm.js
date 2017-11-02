@@ -13,7 +13,11 @@ $(document).ready(function () {
 });
 
 function propertyPage() {
-    var hrefText = $('.icon-broadband').attr("href");
+    var re = new RegExp('postcode":"([A-Z0-9 ]+)"');
+    var exec = re.exec(document.documentElement.innerHTML);
+
+    var hrefText = exec[1];
+
     updateBroadbandSpeedOnPropertyPage(hrefText);
 }
 
@@ -129,7 +133,10 @@ function updatePropertyCard(property) {
         speedCache[propertyId] = 0;
         var link = $(property).find('.propertyCard-link').attr("href");
         $.get(link, function (data) {
-            var hrefText = $(data).find('.icon-broadband').attr("href");
+            var re = new RegExp('postcode":"([A-Z0-9 ]+)"');
+            var exec = re.exec(data);
+
+            var hrefText = exec[1];
 
             if (hrefText) {
                 updateBroadbandSpeedOnSearchResult(hrefText, property);
@@ -141,8 +148,7 @@ function updatePropertyCard(property) {
 }
 
 function updateBroadbandSpeedOnSearchResult(hrefText, property) {
-    var broadbandLink = hrefText.split('#')[1];
-    broadbandLink = broadbandLink.replace("_", "+");
+    var broadbandLink = hrefText.replace(" ", "+");
 
     $.getJSON(url + broadbandLink, function (response) {
         var broadbandSpeed = response['broadbandAverageSpeed'];
@@ -156,8 +162,7 @@ function updateBroadbandSpeedOnSearchResult(hrefText, property) {
 }
 
 function updateBroadbandSpeedOnPropertyPage(hrefText) {
-    var broadbandLink = hrefText.split('#')[1];
-    broadbandLink = broadbandLink.replace("_", "+");
+    var broadbandLink = hrefText.replace(" ", "+");
 
     $.getJSON(url + broadbandLink, function (response) {
         var broadbandSpeed = response['broadbandAverageSpeed'];
