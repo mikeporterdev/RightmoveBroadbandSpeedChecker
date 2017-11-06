@@ -1,20 +1,36 @@
 const url = "http://rightmove.co.uk/ajax/broadband-speed-result.html?searchLocation=";
+const postcodeRegex = new RegExp('postcode":"([A-Z0-9 ]+)"');
+const SPEED_CHROME_STORAGE_KEY = "postcodeSpeed2t";
+const POSTCODE_CHROME_STORAGE_KEY = "postcodeCache2t";
 
+var postcodeCache = {};
 var speedCache = {};
 
 $(document).ready(function () {
-    var pathname = window.location.pathname;
+    chrome.storage.local.get(POSTCODE_CHROME_STORAGE_KEY, function (postcodeStorage) {
+        chrome.storage.local.get(SPEED_CHROME_STORAGE_KEY, function (speedStorage) {
+            let postcodeResult = postcodeStorage[POSTCODE_CHROME_STORAGE_KEY];
+            if (postcodeResult) {
+                postcodeCache = postcodeResult;
+            }
+            let speedResult = speedStorage[SPEED_CHROME_STORAGE_KEY];
+            if (speedResult) {
+                speedCache = speedResult;
+            }
 
-    if (contains(pathname, '/property-to-rent/find.html') || contains(pathname, '/property-for-sale/find.html') || contains(pathname, '/student-accommodation') || contains(pathname, 'new-homes-for-sale')) {
-        searchPage();
-    } else if (contains(pathname, '/property-to-rent/property-') || contains(pathname, '/property-for-sale/property-')) {
-        propertyPage();
-    }
+            var pathname = window.location.pathname;
+
+            if (contains(pathname, '/property-to-rent/find.html') || contains(pathname, '/property-for-sale/find.html') || contains(pathname, '/student-accommodation') || contains(pathname, 'new-homes-for-sale')) {
+                searchPage();
+            } else if (contains(pathname, '/property-to-rent/property-') || contains(pathname, '/property-for-sale/property-')) {
+                renderPropertyPage();
+            }
+        });
+    });
 });
 
-function propertyPage() {
-    var re = new RegExp('postcode":"([A-Z0-9 ]+)"');
-    var exec = re.exec(document.documentElement.innerHTML);
+function renderPropertyPage() {
+    var exec = postcodeRegex.exec(document.documentElement.innerHTML);
 
     var hrefText = exec[1];
 
@@ -34,7 +50,7 @@ function searchPage() {
 
     $('.l-searchResult').bind('DOMNodeInserted, DOMNodeRemoved', function (event) {
         //Ignore the changing of speedtext
-        if (!$(event.target).hasClass("speedText")) {
+        if (!$(event.target).hasClass("speedText") && !$(event.target).hasClass("propertyCard-header") && !$(event.target).hasClass("propertyCard-headerLink")) {
             updateOnChange();
         }
     });
@@ -49,7 +65,7 @@ function setupFilter() {
         forSale = true;
         filterArea = $('#addedToSiteFilter');
     }
-    console.log(filterArea)
+
     filterArea.after(`
     <div class="addedToSiteAndLetType">
         <label class="filters-label">Broadband Speed:</label>
@@ -94,12 +110,12 @@ function setupFilter() {
 }
 
 function cacheSpeedFilter(filterSpeed) {
-    chrome.storage.local.set({'filterSpeed' : filterSpeed}, function () {
+    chrome.storage.local.set({'filterSpeed': filterSpeed}, function () {
         updateSpeedLabel(filterSpeed);
     });
 }
 
-function updateSpeedLabel(speed){
+function updateSpeedLabel(speed) {
     if (!speed || speed == 0) {
         $('#filterSpeedLabel').text("Any");
     } else {
@@ -128,46 +144,54 @@ function updatePropertyCard(property) {
 
     var propertyId = $(property).find('.propertyCard-anchor').attr('id');
 
-    if (!(propertyId in speedCache)) {
-
-        speedCache[propertyId] = 0;
+    if (postcodeCache[propertyId]) {
+        updateBroadbandSpeedOnSearchResult(postcodeCache[propertyId], property);
+    } else {
+        //put storage here
         var link = $(property).find('.propertyCard-link').attr("href");
+
         $.get(link, function (data) {
-            var re = new RegExp('postcode":"([A-Z0-9 ]+)"');
-            var exec = re.exec(data);
+            var postcode = postcodeRegex.exec(data)[1];
 
-            var hrefText = exec[1];
+            if (postcode) {
+                postcodeCache[propertyId] = postcode;
 
-            if (hrefText) {
-                updateBroadbandSpeedOnSearchResult(hrefText, property);
+                chrome.storage.local.set({'postcodeCache2t': postcodeCache}, function () {
+                    updateBroadbandSpeedOnSearchResult(postcode, property);
+                });
             }
         });
-    } else {
-        updateCard(property, speedCache[propertyId]);
     }
 }
 
+
 function updateBroadbandSpeedOnSearchResult(hrefText, property) {
-    var broadbandLink = hrefText.replace(" ", "+");
-
-    $.getJSON(url + broadbandLink, function (response) {
-        var broadbandSpeed = response['broadbandAverageSpeed'];
-
-        var propertyId = $(property).find('.propertyCard-anchor').attr('id');
-        speedCache[propertyId] = broadbandSpeed;
-
-
+    getSpeed(hrefText, function (broadbandSpeed) {
         updateCard(property, broadbandSpeed);
     });
 }
 
 function updateBroadbandSpeedOnPropertyPage(hrefText) {
-    var broadbandLink = hrefText.replace(" ", "+");
-
-    $.getJSON(url + broadbandLink, function (response) {
-        var broadbandSpeed = response['broadbandAverageSpeed'];
+    getSpeed(hrefText, function (broadbandSpeed) {
         $('.fs-22').append(" - " + broadbandSpeed + " mbps");
     });
+}
+
+function getSpeed(postcode, callback) {
+    var postcodeFormatted = postcode.replace(" ", "+");
+
+    if (speedCache[postcode]) {
+        callback(speedCache[postcode]);
+    } else {
+        $.getJSON(url + postcodeFormatted, function (response) {
+            var broadbandSpeed = response['broadbandAverageSpeed'];
+            speedCache[postcode] = broadbandSpeed;
+
+            chrome.storage.local.set({'postcodeSpeed2t': speedCache}, function () {
+                callback(broadbandSpeed);
+            });
+        });
+    }
 }
 
 function updateCard(property, speed) {
